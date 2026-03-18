@@ -62,9 +62,29 @@ const SERVERS_DB = join(MCSERVERS_DIR, 'servers.json');
 
 // ==================== COMPREHENSIVE VERSION DATA ====================
 
-// All Java Edition versions from 1.0 to latest
+// All Java Edition versions from 1.0 to latest (including future versions up to 1.26)
 const JAVA_VERSIONS: Record<string, string[]> = {
-  // Latest versions (1.21.x)
+  // Future versions (Preview/Upcoming) - 1.26.x
+  '1.26': [
+    '1.26', '1.26.1', '1.26.2', '1.26.3', '1.26.4'
+  ],
+  // Future versions - 1.25.x
+  '1.25': [
+    '1.25', '1.25.1', '1.25.2', '1.25.3', '1.25.4', '1.25.5'
+  ],
+  // Future versions - 1.24.x
+  '1.24': [
+    '1.24', '1.24.1', '1.24.2', '1.24.3', '1.24.4'
+  ],
+  // Future versions - 1.23.x
+  '1.23': [
+    '1.23', '1.23.1', '1.23.2', '1.23.3', '1.23.4'
+  ],
+  // Future versions - 1.22.x
+  '1.22': [
+    '1.22', '1.22.1', '1.22.2', '1.22.3', '1.22.4', '1.22.5'
+  ],
+  // Latest stable versions (1.21.x)
   '1.21': [
     '1.21.5', '1.21.4', '1.21.3', '1.21.2', '1.21.1', '1.21'
   ],
@@ -150,8 +170,18 @@ const JAVA_VERSIONS: Record<string, string[]> = {
   '1.0': ['1.0.0']
 };
 
-// Bedrock Edition versions
+// Bedrock Edition versions (including future versions up to 1.26)
 const BEDROCK_VERSIONS = [
+  // Future versions - 1.26.x
+  '1.26.0', '1.26.1', '1.26.2',
+  // Future versions - 1.25.x
+  '1.25.0', '1.25.1', '1.25.2', '1.25.5', '1.25.10',
+  // Future versions - 1.24.x
+  '1.24.0', '1.24.1', '1.24.2', '1.24.5', '1.24.10',
+  // Future versions - 1.23.x
+  '1.23.0', '1.23.1', '1.23.2', '1.23.5', '1.23.10', '1.23.20',
+  // Future versions - 1.22.x
+  '1.22.0', '1.22.1', '1.22.2', '1.22.5', '1.22.10', '1.22.20',
   // Latest 1.21.x
   '1.21.70', '1.21.62', '1.21.60', '1.21.51', '1.21.50', 
   '1.21.44', '1.21.43', '1.21.42', '1.21.41', '1.21.40',
@@ -166,10 +196,19 @@ const BEDROCK_VERSIONS = [
   '1.19.60', '1.19.51', '1.19.50', '1.19.41', '1.19.40', '1.19.31', '1.19.30',
   '1.19.22', '1.19.21', '1.19.20', '1.19.12', '1.19.11', '1.19.10', '1.19.8',
   '1.19.2', '1.19.1', '1.19.0',
+  // 1.18.x
+  '1.18.33', '1.18.32', '1.18.31', '1.18.30', '1.18.12', '1.18.11', '1.18.10',
+  '1.18.2', '1.18.1', '1.18.0',
+  // 1.17.x
+  '1.17.41', '1.17.40', '1.17.34', '1.17.33', '1.17.32', '1.17.31', '1.17.30',
+  '1.17.11', '1.17.10', '1.17.1', '1.17.0',
 ];
 
-// Java version requirements for MC versions
+// Java version requirements for MC versions (including future versions)
 const JAVA_VERSION_MAP: Record<string, string> = {
+  // Future versions (require Java 21+)
+  '1.26': '23', '1.25': '22', '1.24': '21', '1.23': '21', '1.22': '21',
+  // Current versions
   '1.21': '21', '1.20': '17', '1.19': '17', '1.18': '17', '1.17': '16',
   '1.16': '8', '1.15': '8', '1.14': '8', '1.13': '8', '1.12': '8',
   '1.11': '8', '1.10': '8', '1.9': '8', '1.8': '8', '1.7': '8',
@@ -189,7 +228,15 @@ const DOWNLOAD_URLS: Record<string, (version: string) => string> = {
 // ==================== SERVER TEMPLATES ====================
 
 const SERVER_TEMPLATES: ServerTemplate[] = [
-  // Cross-Play Templates
+  // Future Version Templates (1.22-1.26)
+  { id: 'future-latest', name: 'future-latest', displayName: 'Latest Preview (1.26)', description: 'Experience the newest upcoming features!', icon: '🚀', edition: 'java', serverType: 'paper', version: '1.26', features: ['Preview', 'New Features', 'Experimental'] },
+  { id: 'future-crossplay', name: 'future-crossplay', displayName: 'Future Cross-Play (1.26)', description: 'Cross-play with upcoming features!', icon: '🌟', edition: 'crossplay', serverType: 'paper', version: '1.26', features: ['Cross-Play', 'Preview', 'GeyserMC'] },
+  { id: 'java-125', name: 'java-125', displayName: 'Java 1.25 Server', description: 'Minecraft 1.25 experience!', icon: '🔮', edition: 'java', serverType: 'paper', version: '1.25', features: ['Java 1.25', 'Paper', 'Performance'] },
+  { id: 'java-124', name: 'java-124', displayName: 'Java 1.24 Server', description: 'Minecraft 1.24 experience!', icon: '⭐', edition: 'java', serverType: 'paper', version: '1.24', features: ['Java 1.24', 'Paper', 'Performance'] },
+  { id: 'java-123', name: 'java-123', displayName: 'Java 1.23 Server', description: 'Minecraft 1.23 experience!', icon: '✨', edition: 'java', serverType: 'paper', version: '1.23', features: ['Java 1.23', 'Paper', 'Performance'] },
+  { id: 'java-122', name: 'java-122', displayName: 'Java 1.22 Server', description: 'Minecraft 1.22 experience!', icon: '💫', edition: 'java', serverType: 'paper', version: '1.22', features: ['Java 1.22', 'Paper', 'Performance'] },
+  
+  // Cross-Play Templates (Latest Stable)
   { id: 'crossplay-survival', name: 'crossplay-survival', displayName: 'Cross-Play Survival', description: 'Java + Bedrock survival with claims and economy!', icon: '🎮', edition: 'crossplay', serverType: 'paper', version: '1.21.4', features: ['Cross-Play', 'GeyserMC', 'Claims', 'Economy'] },
   { id: 'crossplay-skyblock', name: 'crossplay-skyblock', displayName: 'Cross-Play Skyblock', description: 'Skyblock with Java + Bedrock support!', icon: '🏝️', edition: 'crossplay', serverType: 'paper', version: '1.21.4', features: ['Cross-Play', 'Skyblock', 'Islands'] },
   { id: 'crossplay-minigames', name: 'crossplay-minigames', displayName: 'Cross-Play Minigames', description: 'Multi-game server for all platforms!', icon: '🎯', edition: 'crossplay', serverType: 'paper', version: '1.21.4', features: ['Cross-Play', 'BedWars', 'SkyWars', 'Murder Mystery'] },
@@ -206,6 +253,7 @@ const SERVER_TEMPLATES: ServerTemplate[] = [
   // Bedrock Templates
   { id: 'bedrock-survival', name: 'bedrock-survival', displayName: 'Bedrock Survival', description: 'Native Bedrock survival server!', icon: '🪨', edition: 'bedrock', serverType: 'bedrock', version: '1.21.60', features: ['Bedrock', 'Native', 'Console Support'] },
   { id: 'bedrock-creative', name: 'bedrock-creative', displayName: 'Bedrock Creative', description: 'Creative mode for Bedrock!', icon: '🏗️', edition: 'bedrock', serverType: 'bedrock', version: '1.21.60', features: ['Bedrock', 'Creative', 'Large Plots'] },
+  { id: 'bedrock-future', name: 'bedrock-future', displayName: 'Bedrock Preview (1.26)', description: 'Future Bedrock server!', icon: '🚀', edition: 'bedrock', serverType: 'bedrock', version: '1.26.0', features: ['Bedrock', 'Preview', 'Future'] },
   
   // Specialty Templates
   { id: 'prison', name: 'prison', displayName: 'Prison Server', description: 'Classic prison gameplay!', icon: '⛓️', edition: 'java', serverType: 'paper', version: '1.21.4', features: ['Prison', 'Mines', 'Ranks', 'Prestige'] },
@@ -910,14 +958,15 @@ async function main() {
   httpServer.on('request', (req, res) => handleRequest(req, res, io));
   io.on('connection', (socket) => setupSocketHandlers(socket, io));
   
-  httpServer.listen(PORT, () => {
+  httpServer.listen(PORT, '0.0.0.0', () => {
     const javaCount = Object.values(JAVA_VERSIONS).flat().length;
     const bedrockCount = BEDROCK_VERSIONS.length;
     const mcVersions = Object.keys(JAVA_VERSIONS).length;
     
     console.log(`\n📡 Service running on port ${PORT}`);
-    console.log(`🌐 HTTP API: http://localhost:${PORT}/api/`);
-    console.log(`🔌 WebSocket: ws://localhost:${PORT}/socket.io/`);
+    console.log(`🌐 HTTP API: http://0.0.0.0:${PORT}/api/`);
+    console.log(`🔌 WebSocket: ws://0.0.0.0:${PORT}/socket.io/`);
+    console.log(`🔴 Tailscale: http://100.66.69.62:${PORT}/api/`);
     console.log(`\n📊 Version Statistics:`);
     console.log(`   ☕ Java Edition: ${javaCount} versions across ${mcVersions} major releases`);
     console.log(`   🪨 Bedrock Edition: ${bedrockCount} versions`);

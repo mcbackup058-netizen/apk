@@ -1,46 +1,101 @@
 [minecraft-service] Installing dependencies...
 bun install v1.3.10 (30e609e0)
 
-Checked 23 installs across 24 packages (no changes) [5.00ms]
++ chalk@5.6.2
++ cors@2.8.6
++ socket.io@4.8.3
+
+23 packages installed [170.00ms]
 [minecraft-service] Running bun run dev...
 $ bun --hot index.ts
-==================================================
-  Minecraft Server Management Service
-==================================================
-
-46 |     }
-47 |   }
-48 |   let er;
-49 |   if (args.length > 0)
-50 |     er = args[0];
-51 |     throw er;
-                 ^
-error: Failed to start server. Is port 3005 in use?
-      at emitError (node:events:51:13)
-============================================================
-  Minecraft Server Management Service - Enhanced
-  Supports: Java & Bedrock Edition
-============================================================
-
-Created directory: /home/z/.minecraft-servers/plugins
-Created directory: /home/z/.minecraft-servers/cache
-1261 |       name: player,
-1262 |       edition: 'java',
-1263 |       joinTime: new Date().toISOString()
-1264 |     };
-1265 |     serverProcess.players.set(player, playerInfo);
-1266 |     updatePlayerCount(serverId, io);
-       ^
-SyntaxError: Invalid regular expression: missing )
-      at <parse> (/home/z/my-project/mini-services/minecraft-service/index.ts:1266:1)
-      at native:11:43
-      at processTicksAndRejections (native:7:39)
 ======================================================================
-  Minecraft Server Management Service - Ultimate Edition
-  Cross-Play Support: Java + Bedrock Together!
+  Minecraft Server Manager - Ultimate Edition v2.0
+  Comprehensive Version Support (1.0 - 1.21.x + Bedrock)
 ======================================================================
 
-Created directory: /home/z/.minecraft-servers/templates
-Created directory: /home/z/.minecraft-servers/worlds
-Created directory: /home/z/.minecraft-servers/logs
-error: script "dev" was terminated by signal SIGTERM (Polite quit request)
+📡 Service running on port 3005
+🌐 HTTP API: http://localhost:3005/api/
+🔌 WebSocket: ws://localhost:3005/socket.io/
+
+📊 Version Statistics:
+   ☕ Java Edition: 93 versions across 22 major releases
+   🪨 Bedrock Edition: 60 versions
+   📦 Total: 153 versions available
+
+📦 Resources:
+   📋 Templates: 15
+   🔌 Plugins: 47
+   📂 Categories: 19
+======================================================================
+  Minecraft Server Manager - Ultimate Edition v2.0
+  Comprehensive Version Support (1.0 - 1.21.x + Bedrock)
+======================================================================
+
+📡 Service running on port 3005
+🌐 HTTP API: http://localhost:3005/api/
+🔌 WebSocket: ws://localhost:3005/socket.io/
+
+📊 Version Statistics:
+   ☕ Java Edition: 120 versions across 27 major releases
+   🪨 Bedrock Edition: 60 versions
+   📦 Total: 180 versions available
+
+📦 Resources:
+   📋 Templates: 15
+   🔌 Plugins: 47
+   📂 Categories: 19
+======================================================================
+  Minecraft Server Manager - Ultimate Edition v2.0
+  Comprehensive Version Support (1.0 - 1.21.x + Bedrock)
+======================================================================
+
+📡 Service running on port 3005
+🌐 HTTP API: http://localhost:3005/api/
+🔌 WebSocket: ws://localhost:3005/socket.io/
+
+📊 Version Statistics:
+   ☕ Java Edition: 120 versions across 27 major releases
+   🪨 Bedrock Edition: 106 versions
+   📦 Total: 226 versions available
+
+📦 Resources:
+   📋 Templates: 15
+   🔌 Plugins: 47
+   📂 Categories: 19
+======================================================================
+  Minecraft Server Manager - Ultimate Edition v2.0
+  Comprehensive Version Support (1.0 - 1.21.x + Bedrock)
+======================================================================
+
+📡 Service running on port 3005
+🌐 HTTP API: http://localhost:3005/api/
+🔌 WebSocket: ws://localhost:3005/socket.io/
+
+📊 Version Statistics:
+   ☕ Java Edition: 120 versions across 27 major releases
+   🪨 Bedrock Edition: 106 versions
+   📦 Total: 226 versions available
+
+📦 Resources:
+   📋 Templates: 15
+   🔌 Plugins: 47
+   📂 Categories: 19
+======================================================================
+  Minecraft Server Manager - Ultimate Edition v2.0
+  Comprehensive Version Support (1.0 - 1.21.x + Bedrock)
+======================================================================
+
+📡 Service running on port 3005
+🌐 HTTP API: http://localhost:3005/api/
+🔌 WebSocket: ws://localhost:3005/socket.io/
+
+📊 Version Statistics:
+   ☕ Java Edition: 120 versions across 27 major releases
+   🪨 Bedrock Edition: 106 versions
+   📦 Total: 226 versions available
+
+📦 Resources:
+   📋 Templates: 22
+   🔌 Plugins: 47
+   📂 Categories: 19
+error: script "dev" was terminated by signal SIGKILL (Forced quit)

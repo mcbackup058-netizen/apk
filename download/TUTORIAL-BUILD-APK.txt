@@ -1,0 +1,304 @@
+================================================================================
+            TUTORIAL LENGKAP BUILD APK MINECRAFT SERVER MANAGER
+                       Menggunakan Android Studio
+================================================================================
+
+📦 PERSIAPAN AWAL
+================================================================================
+
+1. DOWNLOAD FILE YANG DIPERLUKAN
+   ------------------------------
+   Download file berikut dari server:
+   
+   a) mc-server-manager-android-project.zip
+      - Ini adalah project Android Studio lengkap
+      
+   b) MC-Server-Manager-Mobile.zip
+      - Berisi index.html untuk assets
+
+2. INSTALL SOFTWARE
+   -----------------
+   Pastikan sudah terinstall:
+   
+   a) Android Studio (versi terbaru - Hedgehog atau baru)
+      Download: https://developer.android.com/studio
+      
+   b) Java JDK 17 atau lebih baru
+      Biasanya sudah include dengan Android Studio
+
+================================================================================
+🚀 LANGKAH-LANGKAH BUILD APK
+================================================================================
+
+LANGKAH 1: EXTRACT PROJECT
+--------------------------
+1. Extract file "mc-server-manager-android-project.zip" ke folder, misalnya:
+   Windows   : C:\Projects\MinecraftServerManager
+   Mac/Linux : ~/Projects/MinecraftServerManager
+
+2. Pastikan struktur folder seperti ini:
+   
+   MinecraftServerManager/
+   ├── app/
+   │   ├── src/
+   │   │   └── main/
+   │   │       ├── assets/
+   │   │       │   └── index.html        <-- File aplikasi
+   │   │       ├── java/
+   │   │       │   └── com/minecraft/servermanager/
+   │   │       │       └── MainActivity.java
+   │   │       ├── res/
+   │   │       │   ├── values/styles.xml
+   │   │       │   ├── mipmap-xxxhdpi/
+   │   │       │   │   ├── ic_launcher.png
+   │   │       │   │   └── ic_launcher_round.png
+   │   │       │   └── xml/network_security_config.xml
+   │   │       └── AndroidManifest.xml
+   │   └── build.gradle
+   ├── build.gradle
+   ├── settings.gradle
+   └── gradle/
+       └── wrapper/
+           └── gradle-wrapper.properties
+
+LANGKAH 2: BUKA PROJECT DI ANDROID STUDIO
+-----------------------------------------
+1. Jalankan Android Studio
+
+2. Pilih "Open" atau "File > Open"
+
+3. Navigate ke folder MinecraftServerManager yang sudah di-extract
+
+4. Klik "OK"
+
+5. TUNGGU proses Gradle Sync (pertama kali bisa memakan waktu 5-10 menit)
+   
+   Catatan: Jika muncul dialog "Gradle Sync Needed", klik "Sync Now"
+
+LANGKAH 3: ATUR SDK LOCATION
+----------------------------
+1. Jika muncul error tentang SDK location:
+   
+   a) Klik "File > Project Structure" (atau Ctrl+Alt+Shift+S)
+   
+   b) Di tab "SDK Location", atur:
+      - Android SDK location: biasanya otomatis terdeteksi
+        Windows: C:\Users\[Username]\AppData\Local\Android\Sdk
+        Mac: ~/Library/Android/sdk
+        Linux: ~/Android/Sdk
+   
+   c) Klik "OK"
+
+LANGKAH 4: UPDATE FILE INDEX.HTML (PENTING!)
+--------------------------------------------
+1. Di panel kiri (Project), buka:
+   app > src > main > assets > index.html
+
+2. Cari baris berikut (di bagian atas file):
+   
+   let API_URL = localStorage.getItem('backendUrl') || 'http://100.66.69.62:3005';
+
+3. Jika ingin testing di emulator lokal (tanpa Tailscale), ubah ke:
+   
+   let API_URL = localStorage.getItem('backendUrl') || 'http://10.0.2.2:3005';
+   
+   Catatan: 10.0.2.2 adalah IP khusus Android Emulator untuk mengakses
+            localhost komputer host
+
+4. Jika ingin menggunakan IP server tertentu, ubah sesuai kebutuhan
+
+5. Save file (Ctrl+S / Cmd+S)
+
+LANGKAH 5: BUILD APK
+--------------------
+1. Di menu atas, pilih:
+   "Build > Build Bundle(s) / APK(s) > Build APK(s)"
+
+2. TUNGGU proses build (biasanya 1-3 menit)
+
+3. Jika berhasil, akan muncul notification di kanan bawah:
+   "APK(s) generated successfully"
+
+4. Klik notification tersebut atau pilih "locate" untuk membuka folder APK
+
+5. File APK berada di:
+   MinecraftServerManager/app/build/outputs/apk/debug/app-debug.apk
+
+================================================================================
+📱 INSTALASI APK KE DEVICE
+================================================================================
+
+METODE 1: LANGSUNG DARI ANDROID STUDIO
+--------------------------------------
+1. Hubungkan HP ke komputer via USB
+
+2. Aktifkan "USB Debugging" di HP:
+   - Buka Settings > About Phone
+   - Tap "Build Number" 7x sampai muncul "Developer Mode Enabled"
+   - Kembali ke Settings > Developer Options
+   - Aktifkan "USB Debugging"
+
+3. Di Android Studio, pilih device di dropdown (pojok kanan atas)
+
+4. Klik tombol "Run" (icon play hijau)
+
+5. Aplikasi akan terinstall dan terbuka otomatis
+
+METODE 2: TRANSFER MANUAL
+-------------------------
+1. Copy file app-debug.apk ke HP (via USB, email, cloud storage, dll)
+
+2. Di HP, buka file manager
+
+3. Tap file APK
+
+4. Jika muncul peringatan "Install blocked":
+   - Buka Settings > Allow from this source
+   - Aktifkan permission untuk file manager/browser
+
+5. Klik "Install"
+
+6. Buka aplikasi dari launcher
+
+================================================================================
+🔌 KONEKSI KE BACKEND VIA TAILSCALE
+================================================================================
+
+PENTING: Device HP HARUS terhubung ke Tailscale untuk mengakses backend!
+
+LANGKAH 1: INSTALL TAILSCALE DI HP
+----------------------------------
+1. Download Tailscale dari Play Store:
+   https://play.google.com/store/apps/details?id=com.tailscale.ipn
+
+2. Buka aplikasi Tailscale
+
+3. Login dengan akun yang sama dengan server:
+   - Email: projectssmakda@
+   - Atau akun yang sudah terdaftar
+
+LANGKAH 2: CONNECT KE JARINGAN
+------------------------------
+1. Di aplikasi Tailscale, toggle "On" untuk connect
+
+2. Pastikan status menjadi "Connected"
+
+3. Verifikasi dengan melihat IP Tailscale device Anda
+   (contoh: 100.xx.xx.xx)
+
+LANGKAH 3: VERIFIKASI KONEKSI
+-----------------------------
+1. Buka aplikasi MC Server Manager
+
+2. Jika koneksi berhasil, akan muncul:
+   - Status: "Terhubung" (titik hijau)
+   - List server akan tampil
+
+3. Jika gagal:
+   - Cek status Tailscale (harus Connected)
+   - Pastikan backend server aktif di 100.66.69.62:3005
+   - Coba restart aplikasi
+
+================================================================================
+🛠️ TROUBLESHOOTING
+================================================================================
+
+MASALAH 1: Gradle Sync Failed
+------------------------------
+Solusi:
+1. Pastikan koneksi internet stabil
+2. Klik "File > Invalidate Caches / Restart"
+3. Pilih "Invalidate and Restart"
+4. Tunggu sync ulang
+
+MASALAH 2: SDK Not Found
+------------------------
+Solusi:
+1. Buka "Tools > SDK Manager"
+2. Install SDK Platform 34 (Android 14)
+3. Install Android SDK Build-Tools 34
+4. Klik "Apply" dan tunggu download
+
+MASALAH 3: "Cannot resolve symbol" error
+----------------------------------------
+Solusi:
+1. Klik "File > Sync Project with Gradle Files"
+2. Jika masih error, klik "Build > Clean Project"
+3. Kemudian "Build > Rebuild Project"
+
+MASALAH 4: APK tidak bisa connect ke backend
+--------------------------------------------
+Solusi:
+1. Pastikan HP terhubung ke Tailscale
+2. Cek IP backend aktif: buka browser di HP, akses:
+   http://100.66.69.62:3005/api/versions
+3. Jika tidak bisa diakses, cek:
+   - Backend server running?
+   - Tailscale connected di kedua sisi?
+   - Firewall tidak memblokir port 3005?
+
+MASALAH 5: App crash saat dibuka
+--------------------------------
+Solusi:
+1. Cek logcat di Android Studio:
+   - Buka "Logcat" tab di bawah
+   - Filter dengan package name: com.minecraft.servermanager
+   - Lihat error message
+
+2. Common causes:
+   - index.html tidak ada di assets folder
+   - Network security config salah
+   - Permission tidak ada di AndroidManifest.xml
+
+================================================================================
+📝 KONFIGURASI TAMBAHAN
+================================================================================
+
+MENGGANTI URL BACKEND SETELAH INSTALL
+-------------------------------------
+1. Buka aplikasi MC Server Manager
+2. Pilih tab "Settings" (paling kanan)
+3. Di bagian "Ganti Backend URL", masukkan URL baru
+4. Klik "Simpan"
+5. Aplikasi akan restart dan menggunakan URL baru
+
+MENAMBAH VERSI MINECRAFT BARU
+------------------------------
+Backend sudah mendukung versi 1.0 hingga 1.26, termasuk:
+- 120 versi Java Edition
+- 106 versi Bedrock Edition
+- 22 template server
+- 47+ plugin
+
+MENGGANTI ICON APLIKASI
+-----------------------
+1. Siapkan icon dengan ukuran:
+   - mdpi: 48x48
+   - hdpi: 72x72
+   - xhdpi: 96x96
+   - xxhdpi: 144x144
+   - xxxhdpi: 192x192
+
+2. Letakkan di folder masing-masing:
+   app/src/main/res/mipmap-[density]/ic_launcher.png
+
+3. Rebuild APK
+
+================================================================================
+📞 SUPPORT
+================================================================================
+
+Jika mengalami masalah:
+
+1. Cek status backend:
+   curl http://100.66.69.62:3005/api/versions
+
+2. Cek koneksi Tailscale:
+   tailscale status
+
+3. Cek log backend:
+   tail -f /tmp/minecraft-service.log
+
+================================================================================
+                        SELESAI - SELAMAT MENCOBA!
+================================================================================

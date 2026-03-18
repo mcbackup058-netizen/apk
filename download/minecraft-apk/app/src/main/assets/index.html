@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Minecraft Server Manager</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #6366f1; --primary-dark: #4f46e5; --secondary: #22c55e;
+            --bg-dark: #0f0f23; --bg-card: #1a1a2e; --bg-input: #16213e;
+            --text: #ffffff; --text-muted: #94a3b8; --danger: #ef4444;
+            --warning: #f59e0b; --success: #22c55e; --border: #2d2d44;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            padding: 20px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header h1 { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        .header .subtitle { font-size: 12px; opacity: 0.8; margin-top: 4px; }
+        .status-bar {
+            background: var(--bg-card);
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+        .connection-status { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .status-dot.online { background: var(--success); box-shadow: 0 0 10px var(--success); }
+        .status-dot.offline { background: var(--danger); }
+        .tabs {
+            display: flex;
+            background: var(--bg-card);
+            overflow-x: auto;
+            border-bottom: 1px solid var(--border);
+        }
+        .tab {
+            flex: 1;
+            min-width: 80px;
+            padding: 14px 8px;
+            text-align: center;
+            font-size: 12px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        .tab.active { border-bottom-color: var(--primary); color: var(--primary); }
+        .tab:hover { background: rgba(99, 102, 241, 0.1); }
+        .tab-icon { font-size: 20px; margin-bottom: 4px; }
+        .content { padding: 16px; padding-bottom: 100px; }
+        .card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
+        }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .card-title { font-weight: 600; font-size: 16px; }
+        .server-card { position: relative; }
+        .server-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .server-status.running { background: rgba(34, 197, 94, 0.2); color: var(--success); }
+        .server-status.stopped { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+        .server-status.starting { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+        .server-info { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 12px; }
+        .info-item { text-align: center; padding: 10px; background: var(--bg-input); border-radius: 8px; }
+        .info-value { font-size: 18px; font-weight: 700; color: var(--primary); }
+        .info-label { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+        .btn {
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+        .btn-sm { padding: 8px 12px; font-size: 12px; }
+        .btn-group { display: flex; gap: 8px; margin-top: 12px; }
+        .btn-group .btn { flex: 1; }
+        .fab {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+            z-index: 50;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 200;
+            align-items: flex-end;
+            justify-content: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: var(--bg-card);
+            width: 100%;
+            max-height: 90vh;
+            border-radius: 20px 20px 0 0;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-close { background: none; border: none; color: var(--text-muted); font-size: 24px; cursor: pointer; }
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; margin-bottom: 6px; font-size: 13px; color: var(--text-muted); }
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 14px;
+        }
+        .form-input:focus { outline: none; border-color: var(--primary); }
+        .form-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
+        .template-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .template-card {
+            background: var(--bg-input);
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        .template-card:hover, .template-card.selected { border-color: var(--primary); }
+        .template-icon { font-size: 32px; margin-bottom: 8px; }
+        .template-name { font-weight: 600; font-size: 14px; }
+        .template-desc { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+        .template-features { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+        .template-features span {
+            font-size: 9px;
+            padding: 2px 6px;
+            background: rgba(99, 102, 241, 0.2);
+            border-radius: 4px;
+            color: var(--primary);
+        }
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
+        .empty-icon { font-size: 48px; margin-bottom: 16px; }
+        .loading { display: flex; justify-content: center; padding: 40px; }
+        .spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .version-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            background: rgba(99, 102, 241, 0.2);
+            border-radius: 4px;
+            font-size: 11px;
+            color: var(--primary);
+            margin-right: 4px;
+            margin-bottom: 4px;
+        }
+        .edition-badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: 8px; }
+        .edition-badge.java { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+        .edition-badge.bedrock { background: rgba(34, 197, 94, 0.2); color: var(--success); }
+        .edition-badge.crossplay { background: rgba(168, 85, 247, 0.2); color: #a855f7; }
+        .console {
+            background: #000;
+            border-radius: 8px;
+            padding: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            height: 200px;
+            overflow-y: auto;
+            margin-top: 12px;
+        }
+        .console-line { margin-bottom: 2px; }
+        .console-line.stdout { color: #22c55e; }
+        .console-line.stderr { color: #ef4444; }
+        .console-line.command { color: #f59e0b; }
+        .console-input {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .console-input input { flex: 1; }
+        .panel { display: none; }
+        .panel.active { display: block; }
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .settings-label { font-size: 14px; }
+        .settings-value { color: var(--text-muted); font-size: 13px; }
+        .version-list { max-height: 300px; overflow-y: auto; }
+        .version-group { margin-bottom: 12px; }
+        .version-group-title { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; padding: 4px 8px; background: var(--bg-input); border-radius: 4px; }
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-card);
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            z-index: 300;
+            display: none;
+        }
+        .toast.show { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⛏️ MC Server Manager</h1>
+        <div class="subtitle" id="serverUrl">http://100.66.69.62:3005</div>
+    </div>
+    
+    <div class="status-bar">
+        <div class="connection-status">
+            <div class="status-dot" id="statusDot"></div>
+            <span id="statusText">Menghubungkan...</span>
+        </div>
+        <button class="btn btn-sm btn-outline" onclick="refreshAll()">🔄 Refresh</button>
+    </div>
+    
+    <div class="tabs">
+        <div class="tab active" onclick="showPanel('servers')">
+            <div class="tab-icon">🖥️</div>
+            <div>Servers</div>
+        </div>
+        <div class="tab" onclick="showPanel('create')">
+            <div class="tab-icon">➕</div>
+            <div>Create</div>
+        </div>
+        <div class="tab" onclick="showPanel('templates')">
+            <div class="tab-icon">📦</div>
+            <div>Templates</div>
+        </div>
+        <div class="tab" onclick="showPanel('plugins')">
+            <div class="tab-icon">🔌</div>
+            <div>Plugins</div>
+        </div>
+        <div class="tab" onclick="showPanel('settings')">
+            <div class="tab-icon">⚙️</div>
+            <div>Settings</div>
+        </div>
+    </div>
+    
+    <div class="content">
+        <!-- Servers Panel -->
+        <div class="panel active" id="serversPanel">
+            <div id="serversList"></div>
+        </div>
+        
+        <!-- Create Panel -->
+        <div class="panel" id="createPanel">
+            <div class="card">
+                <div class="card-title">Buat Server Baru</div>
+                <div class="form-group">
+                    <label class="form-label">Nama Server</label>
+                    <input type="text" class="form-input" id="serverName" placeholder="my-server">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Edition</label>
+                    <select class="form-input form-select" id="serverEdition" onchange="updateVersions()">
+                        <option value="java">☕ Java Edition</option>
+                        <option value="bedrock">🪨 Bedrock Edition</option>
+                        <option value="crossplay">🎮 Cross-Play</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Versi Minecraft</label>
+                    <select class="form-input form-select" id="serverVersion"></select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Server Type</label>
+                    <select class="form-input form-select" id="serverType">
+                        <option value="paper">Paper (Recommended)</option>
+                        <option value="vanilla">Vanilla</option>
+                        <option value="purpur">Purpur</option>
+                        <option value="fabric">Fabric</option>
+                        <option value="forge">Forge</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Port</label>
+                    <input type="number" class="form-input" id="serverPort" value="25565">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Max Memory (MB)</label>
+                    <input type="number" class="form-input" id="serverMemory" value="2048">
+                </div>
+                <button class="btn btn-primary" style="width: 100%;" onclick="createServer()">🚀 Buat Server</button>
+            </div>
+        </div>
+        
+        <!-- Templates Panel -->
+        <div class="panel" id="templatesPanel">
+            <div class="template-grid" id="templatesList"></div>
+        </div>
+        
+        <!-- Plugins Panel -->
+        <div class="panel" id="pluginsPanel">
+            <div id="pluginsList"></div>
+        </div>
+        
+        <!-- Settings Panel -->
+        <div class="panel" id="settingsPanel">
+            <div class="card">
+                <div class="card-title">⚙️ Pengaturan</div>
+                <div class="settings-item">
+                    <div>
+                        <div class="settings-label">Server Backend</div>
+                    </div>
+                    <div class="settings-value" id="backendUrl">100.66.69.62:3005</div>
+                </div>
+                <div class="settings-item">
+                    <div>
+                        <div class="settings-label">Versi Java</div>
+                    </div>
+                    <div class="settings-value" id="javaCount">-</div>
+                </div>
+                <div class="settings-item">
+                    <div>
+                        <div class="settings-label">Versi Bedrock</div>
+                    </div>
+                    <div class="settings-value" id="bedrockCount">-</div>
+                </div>
+                <div class="settings-item">
+                    <div>
+                        <div class="settings-label">Templates</div>
+                    </div>
+                    <div class="settings-value" id="templateCount">-</div>
+                </div>
+                <div class="settings-item">
+                    <div>
+                        <div class="settings-label">Plugins</div>
+                    </div>
+                    <div class="settings-value" id="pluginCount">-</div>
+                </div>
+                <div class="form-group" style="margin-top: 16px;">
+                    <label class="form-label">Ganti Backend URL</label>
+                    <input type="text" class="form-input" id="newBackendUrl" placeholder="http://100.66.69.62:3005">
+                    <button class="btn btn-primary btn-sm" style="margin-top: 8px; width: 100%;" onclick="changeBackend()">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <button class="fab" onclick="showCreateModal()">+</button>
+    
+    <!-- Server Detail Modal -->
+    <div class="modal" id="serverModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalServerName">Server Detail</h3>
+                <button class="modal-close" onclick="closeModal('serverModal')">&times;</button>
+            </div>
+            <div id="modalServerContent"></div>
+        </div>
+    </div>
+    
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Configuration
+        let API_URL = localStorage.getItem('backendUrl') || 'http://100.66.69.62:3005';
+        let servers = [];
+        let versions = { java: [], bedrock: [] };
+        let templates = [];
+        let plugins = [];
+        let selectedTemplate = null;
+        let currentServerId = null;
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('newBackendUrl').value = API_URL;
+            refreshAll();
+            setInterval(refreshServers, 5000);
+        });
+        
+        // API Functions
+        async function api(endpoint, method = 'GET', data = null) {
+            try {
+                const options = { method, headers: { 'Content-Type': 'application/json' } };
+                if (data) options.body = JSON.stringify(data);
+                const response = await fetch(`${API_URL}${endpoint}`, options);
+                return await response.json();
+            } catch (error) {
+                console.error('API Error:', error);
+                return null;
+            }
+        }
+        
+        async function refreshAll() {
+            updateConnectionStatus('connecting');
+            await Promise.all([refreshServers(), refreshVersions(), refreshTemplates(), refreshPlugins()]);
+            updateConnectionStatus('online');
+        }
+        
+        async function refreshServers() {
+            const data = await api('/api/servers');
+            servers = data || [];
+            renderServers();
+        }
+        
+        async function refreshVersions() {
+            const data = await api('/api/versions');
+            if (data) {
+                versions = data;
+                document.getElementById('javaCount').textContent = data.total?.java || 0;
+                document.getElementById('bedrockCount').textContent = data.total?.bedrock || 0;
+                updateVersions();
+            }
+        }
+        
+        async function refreshTemplates() {
+            const data = await api('/api/templates');
+            templates = data || [];
+            document.getElementById('templateCount').textContent = templates.length;
+            renderTemplates();
+        }
+        
+        async function refreshPlugins() {
+            const data = await api('/api/plugins');
+            plugins = data?.plugins || [];
+            document.getElementById('pluginCount').textContent = plugins.length;
+            renderPlugins();
+        }
+        
+        // UI Functions
+        function updateConnectionStatus(status) {
+            const dot = document.getElementById('statusDot');
+            const text = document.getElementById('statusText');
+            dot.className = 'status-dot';
+            if (status === 'online') {
+                dot.classList.add('online');
+                text.textContent = 'Terhubung';
+            } else if (status === 'offline') {
+                dot.classList.add('offline');
+                text.textContent = 'Terputus';
+            } else {
+                text.textContent = 'Menghubungkan...';
+            }
+        }
+        
+        function showPanel(panel) {
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(`${panel}Panel`).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+        
+        function renderServers() {
+            const container = document.getElementById('serversList');
+            if (servers.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🖥️</div>
+                        <p>Belum ada server</p>
+                        <p style="font-size: 12px; margin-top: 8px;">Tap + untuk membuat server baru</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = servers.map(server => `
+                <div class="card server-card" onclick="showServerDetail('${server.id}')">
+                    <div class="card-header">
+                        <div>
+                            <span class="card-title">${server.displayName || server.name}</span>
+                            <span class="edition-badge ${server.edition}">${server.edition}</span>
+                        </div>
+                        <span class="server-status ${server.status}">${getStatusIcon(server.status)} ${server.status}</span>
+                    </div>
+                    <div class="server-info">
+                        <div class="info-item">
+                            <div class="info-value">${server.version}</div>
+                            <div class="info-label">Version</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-value">${server.playersOnline}/${server.maxPlayers}</div>
+                            <div class="info-label">Players</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-value">${server.port}</div>
+                            <div class="info-label">Port</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-value">${server.tps?.toFixed(1) || '20.0'}</div>
+                            <div class="info-label">TPS</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function getStatusIcon(status) {
+            switch(status) {
+                case 'running': return '🟢';
+                case 'stopped': return '🔴';
+                case 'starting': return '🟡';
+                case 'stopping': return '🟠';
+                default: return '⚪';
+            }
+        }
+        
+        function renderTemplates() {
+            const container = document.getElementById('templatesList');
+            container.innerHTML = templates.map(t => `
+                <div class="template-card" onclick="selectTemplate('${t.id}')">
+                    <div class="template-icon">${t.icon}</div>
+                    <div class="template-name">${t.displayName}</div>
+                    <div class="template-desc">${t.description}</div>
+                    <div class="template-features">
+                        ${t.features.slice(0, 3).map(f => `<span>${f}</span>`).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function renderPlugins() {
+            const container = document.getElementById('pluginsList');
+            const categories = [...new Set(plugins.map(p => p.category))];
+            
+            container.innerHTML = categories.map(cat => `
+                <div class="card">
+                    <div class="card-title">${cat}</div>
+                    ${plugins.filter(p => p.category === cat).slice(0, 5).map(p => `
+                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border);">
+                            <div>
+                                <div style="font-size: 13px;">${p.displayName}</div>
+                                <div style="font-size: 11px; color: var(--text-muted);">${p.description?.substring(0, 50)}...</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="color: var(--warning); font-size: 12px;">⭐ ${p.rating}</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `).join('');
+        }
+        
+        function updateVersions() {
+            const edition = document.getElementById('serverEdition').value;
+            const select = document.getElementById('serverVersion');
+            
+            let versionList = [];
+            if (edition === 'bedrock') {
+                versionList = versions.bedrock || [];
+            } else {
+                versionList = versions.java || [];
+            }
+            
+            select.innerHTML = versionList.slice(0, 50).map(v => `<option value="${v}">${v}</option>`).join('');
+        }
+        
+        async function createServer() {
+            const name = document.getElementById('serverName').value || `server-${Date.now()}`;
+            const edition = document.getElementById('serverEdition').value;
+            const version = document.getElementById('serverVersion').value;
+            const serverType = document.getElementById('serverType').value;
+            const port = parseInt(document.getElementById('serverPort').value) || 25565;
+            const memory = parseInt(document.getElementById('serverMemory').value) || 2048;
+            
+            const result = await api('/api/action', 'POST', {
+                action: 'create',
+                name,
+                edition,
+                version,
+                serverType,
+                port,
+                maxMemory: memory,
+                displayName: name
+            });
+            
+            if (result?.success) {
+                showToast('✅ Server berhasil dibuat!');
+                refreshServers();
+            } else {
+                showToast('❌ Gagal membuat server');
+            }
+        }
+        
+        async function startServer(id) {
+            const result = await api('/api/action', 'POST', { action: 'start', serverId: id });
+            showToast(result?.success ? '🚀 Server dimulai!' : '❌ Gagal memulai server');
+            refreshServers();
+        }
+        
+        async function stopServer(id) {
+            const result = await api('/api/action', 'POST', { action: 'stop', serverId: id });
+            showToast(result?.success ? '⏹️ Server dihentikan!' : '❌ Gagal menghentikan server');
+            refreshServers();
+        }
+        
+        async function deleteServer(id) {
+            if (confirm('Yakin ingin menghapus server ini?')) {
+                const result = await api('/api/action', 'POST', { action: 'delete', serverId: id });
+                showToast(result?.success ? '🗑️ Server dihapus!' : '❌ Gagal menghapus server');
+                refreshServers();
+                closeModal('serverModal');
+            }
+        }
+        
+        function showServerDetail(id) {
+            currentServerId = id;
+            const server = servers.find(s => s.id === id);
+            if (!server) return;
+            
+            document.getElementById('modalServerName').textContent = server.displayName || server.name;
+            document.getElementById('modalServerContent').innerHTML = `
+                <div class="server-status ${server.status}" style="margin-bottom: 16px;">
+                    ${getStatusIcon(server.status)} ${server.status.toUpperCase()}
+                </div>
+                <div class="server-info">
+                    <div class="info-item">
+                        <div class="info-value">${server.version}</div>
+                        <div class="info-label">Version</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-value">${server.playersOnline}/${server.maxPlayers}</div>
+                        <div class="info-label">Players</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-value">${server.port}</div>
+                        <div class="info-label">Port</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-value">${server.memoryUsed || 0} MB</div>
+                        <div class="info-label">Memory</div>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    ${server.status === 'running' 
+                        ? '<button class="btn btn-danger" onclick="stopServer(\'' + id + '\')">⏹️ Stop</button>'
+                        : '<button class="btn btn-success" onclick="startServer(\'' + id + '\')">▶️ Start</button>'
+                    }
+                    <button class="btn btn-outline" onclick="deleteServer(\'' + id + '\')">🗑️ Delete</button>
+                </div>
+            `;
+            
+            document.getElementById('serverModal').classList.add('active');
+        }
+        
+        function selectTemplate(id) {
+            const template = templates.find(t => t.id === id);
+            if (!template) return;
+            
+            document.getElementById('serverName').value = template.name;
+            document.getElementById('serverEdition').value = template.edition;
+            updateVersions();
+            setTimeout(() => {
+                document.getElementById('serverVersion').value = template.version;
+            }, 100);
+            document.getElementById('serverType').value = template.serverType;
+            
+            showPanel('create');
+            document.querySelectorAll('.tab')[1].click();
+            showToast(`📦 Template "${template.displayName}" dipilih`);
+        }
+        
+        function showCreateModal() {
+            showPanel('create');
+            document.querySelectorAll('.tab')[1].click();
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+        
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+        
+        function changeBackend() {
+            const newUrl = document.getElementById('newBackendUrl').value;
+            if (newUrl) {
+                API_URL = newUrl;
+                localStorage.setItem('backendUrl', newUrl);
+                document.getElementById('serverUrl').textContent = newUrl;
+                document.getElementById('backendUrl').textContent = newUrl.replace('http://', '').replace('https://', '');
+                showToast('✅ Backend URL diubah!');
+                refreshAll();
+            }
+        }
+    </script>
+</body>
+</html>
