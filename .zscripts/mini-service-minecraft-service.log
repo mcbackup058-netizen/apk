@@ -1,0 +1,46 @@
+[minecraft-service] Installing dependencies...
+bun install v1.3.10 (30e609e0)
+
+Checked 23 installs across 24 packages (no changes) [5.00ms]
+[minecraft-service] Running bun run dev...
+$ bun --hot index.ts
+==================================================
+  Minecraft Server Management Service
+==================================================
+
+46 |     }
+47 |   }
+48 |   let er;
+49 |   if (args.length > 0)
+50 |     er = args[0];
+51 |     throw er;
+                 ^
+error: Failed to start server. Is port 3005 in use?
+      at emitError (node:events:51:13)
+============================================================
+  Minecraft Server Management Service - Enhanced
+  Supports: Java & Bedrock Edition
+============================================================
+
+Created directory: /home/z/.minecraft-servers/plugins
+Created directory: /home/z/.minecraft-servers/cache
+1261 |       name: player,
+1262 |       edition: 'java',
+1263 |       joinTime: new Date().toISOString()
+1264 |     };
+1265 |     serverProcess.players.set(player, playerInfo);
+1266 |     updatePlayerCount(serverId, io);
+       ^
+SyntaxError: Invalid regular expression: missing )
+      at <parse> (/home/z/my-project/mini-services/minecraft-service/index.ts:1266:1)
+      at native:11:43
+      at processTicksAndRejections (native:7:39)
+======================================================================
+  Minecraft Server Management Service - Ultimate Edition
+  Cross-Play Support: Java + Bedrock Together!
+======================================================================
+
+Created directory: /home/z/.minecraft-servers/templates
+Created directory: /home/z/.minecraft-servers/worlds
+Created directory: /home/z/.minecraft-servers/logs
+error: script "dev" was terminated by signal SIGTERM (Polite quit request)

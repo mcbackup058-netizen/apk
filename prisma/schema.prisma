@@ -1,0 +1,253 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// User management
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  password      String?
+  role          String    @default("user") // admin, moderator, user
+  avatar        String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  activities    Activity[]
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token        String   @unique
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+}
+
+// Minecraft Server Management
+model MCServer {
+  id                String        @id @default(cuid())
+  name              String
+  displayName       String?
+  description       String?
+  version           String        // Minecraft version: 1.20.4, 1.19.2, etc.
+  serverType        String        @default("vanilla") // vanilla, paper, spigot, forge, fabric, bedrock
+  javaVersion       String        @default("17") // 8, 11, 17, 21
+  port              Int           @default(25565)
+  queryPort         Int           @default(25565)
+  rconPort          Int           @default(25575)
+  rconPassword      String?
+  maxPlayers        Int           @default(20)
+  difficulty        String        @default("normal") // peaceful, easy, normal, hard
+  gamemode          String        @default("survival") // survival, creative, adventure, spectator
+  levelName         String        @default("world")
+  levelSeed         String?
+  levelType        String        @default("minecraft:normal")
+  motd              String?
+  onlineMode       Boolean       @default(true)
+  pvp              Boolean       @default(true)
+  spawnProtection   Int           @default(16)
+  viewDistance      Int           @default(10)
+  simulationDistance Int          @default(10)
+  allowFlight       Boolean       @default(false)
+  allowNether       Boolean       @default(true)
+  spawnAnimals      Boolean       @default(true)
+  spawnMonsters     Boolean       @default(true)
+  spawnNPCs         Boolean       @default(true)
+  hardcore          Boolean       @default(false)
+  whitelist         Boolean       @default(false)
+  enforceWhitelist  Boolean       @default(false)
+  ops               String?       // JSON array of operator UUIDs
+  bannedPlayers     String?       // JSON array of banned player UUIDs
+  bannedIPs         String?       // JSON array of banned IPs
+  // Runtime status
+  status            String        @default("stopped") // stopped, starting, running, stopping, crashed
+  pid               Int?
+  uptime            Int           @default(0) // seconds
+  playersOnline     Int           @default(0)
+  playersList       String?       // JSON array of online players
+  memoryUsed        Int           @default(0) // MB
+  memoryMax         Int           @default(2048) // MB
+  cpuUsage          Float         @default(0)
+  tps               Float         @default(20.0)
+  lastStarted       DateTime?
+  lastStopped       DateTime?
+  lastBackup        DateTime?
+  autoStart         Boolean       @default(false)
+  autoRestart       Boolean       @default(false)
+  autoBackup        Boolean       @default(false)
+  backupInterval    Int           @default(24) // hours
+  restartOnCrash    Boolean       @default(true)
+  // Paths
+  serverPath        String?
+  jarFile           String?
+  // Resource limits
+  minMemory         Int           @default(512) // MB
+  maxMemory         Int           @default(2048) // MB
+  cpuLimit          Int           @default(100) // percentage
+  // Mod/Plugin support
+  modLoader         String?       // forge, fabric, neoforge
+  modLoaderVersion  String?
+  plugins           String?       // JSON array of installed plugins
+  // Custom settings
+  serverProperties  String?       // JSON object of additional server.properties
+  jvmArgs           String?       // Custom JVM arguments
+  // Timestamps
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  // Relations
+  worlds            MCWorld[]
+  backups           MCBackup[]
+  players           MCPlayer[]
+  consoleLogs       MCConsoleLog[]
+  scheduledTasks    MCScheduledTask[]
+}
+
+model MCWorld {
+  id              String    @id @default(cuid())
+  serverId        String
+  server          MCServer  @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  name            String
+  displayName     String?
+  description     String?
+  worldType       String    @default("overworld") // overworld, nether, end, custom
+  seed            String?
+  difficulty      String?
+  gamemode        String?
+  sizeBytes       Int       @default(0)
+  lastAccessed    DateTime?
+  isLoaded        Boolean   @default(false)
+  isBackup        Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model MCBackup {
+  id              String    @id @default(cuid())
+  serverId        String
+  server          MCServer  @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  name            String
+  description     String?
+  backupType      String    @default("manual") // manual, scheduled, pre-update
+  worldName       String?
+  sizeBytes       Int       @default(0)
+  filePath        String?
+  isCompressed    Boolean   @default(true)
+  isEncrypted     Boolean   @default(false)
+  retentionDays   Int       @default(30)
+  expiresAt       DateTime?
+  createdAt       DateTime  @default(now())
+}
+
+model MCPlayer {
+  id              String    @id @default(cuid())
+  serverId        String
+  server          MCServer  @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  uuid            String
+  username        String
+  displayName     String?
+  isOnline        Boolean   @default(false)
+  isOp            Boolean   @default(false)
+  isWhitelisted   Boolean   @default(false)
+  isBanned        Boolean   @default(false)
+  banReason       String?
+  banExpiry       DateTime?
+  muteExpiry      DateTime?
+  firstJoin       DateTime?
+  lastJoin        DateTime?
+  lastLeave       DateTime?
+  playTime        Int       @default(0) // seconds
+  totalJoins      Int       @default(0)
+  ipAddresses     String?   // JSON array of historical IPs
+  position        String?   // JSON: {x, y, z, world}
+  inventory       String?   // JSON backup of inventory
+  stats           String?   // JSON of player stats
+  achievements    String?   // JSON of achievements
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@unique([serverId, uuid])
+}
+
+model MCConsoleLog {
+  id              String    @id @default(cuid())
+  serverId        String
+  server          MCServer  @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  level           String    @default("info") // info, warn, error, debug
+  message         String
+  source          String?   // server, player, system
+  playerId        String?
+  timestamp       DateTime  @default(now())
+}
+
+model MCScheduledTask {
+  id              String    @id @default(cuid())
+  serverId        String
+  server          MCServer  @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  name            String
+  description     String?
+  taskType        String    // restart, backup, command, broadcast
+  schedule        String    // cron expression or interval
+  command         String?
+  isEnabled       Boolean   @default(true)
+  lastRun         DateTime?
+  nextRun         DateTime?
+  runCount        Int       @default(0)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+// Activity logs for auditing
+model Activity {
+  id              String    @id @default(cuid())
+  userId          String?
+  user            User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action          String
+  targetType      String?   // server, player, backup, world
+  targetId        String?
+  details         String?   // JSON
+  ipAddress       String?
+  userAgent       String?
+  createdAt       DateTime  @default(now())
+}
+
+// Minecraft version cache
+model MCVersion {
+  id              String    @id @default(cuid())
+  version         String    @unique
+  versionType     String    // release, snapshot
+  releaseDate     DateTime?
+  downloadUrl     String?
+  serverJarUrl    String?
+  clientJarUrl    String?
+  javaVersion     String?
+  isSupported     Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+// Plugin/Mod templates
+model MCPluginTemplate {
+  id              String    @id @default(cuid())
+  name            String
+  displayName     String?
+  description     String?
+  pluginType      String    // spigot, bukkit, paper, fabric, forge
+  downloadUrl     String?
+  version         String?
+  author          String?
+  category        String?
+  tags            String?   // JSON array
+  isEnabled       Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}

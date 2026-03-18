@@ -1,0 +1,14 @@
+{
+  "name": "minecraft-service",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "bun --hot index.ts",
+    "start": "bun index.ts"
+  },
+  "dependencies": {
+    "socket.io": "^4.7.2",
+    "cors": "^2.8.5",
+    "chalk": "^5.3.0"
+  }
+}

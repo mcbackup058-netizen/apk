@@ -1,0 +1,46 @@
+===============================================================================
+                    SSH PRIVATE KEY - WORKSPACE
+===============================================================================
+
+🔐 PRIVATE KEY (OpenSSH Format)
+-------------------------------------------------------------------------------
+-----BEGIN OPENSSH PRIVATE KEY-----
+b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZWQyNTUx
+OQAAACD8B/FJqHLFokyoNL8WH9EXuBi+3Og66sw/1vyoYGdBCQAAAIhEbL4CRGy+AgAAAAtzc2gt
+ZWQyNTUxOQAAACD8B/FJqHLFokyoNL8WH9EXuBi+3Og66sw/1vyoYGdBCQAAAEB+Jw4Wa7s5hcdv
+5+orWe17DbG2vHlzKjly4ntPTXqr0fwH8UmocsWiTKg0vxYf0Re4GL7c6DrqzD/W/KhgZ0EJAAAA
+AAECAwQF
+-----END OPENSSH PRIVATE KEY-----
+-------------------------------------------------------------------------------
+
+📢 PUBLIC KEY
+-------------------------------------------------------------------------------
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPwH8UmocsWiTKg0vxYf0Re4GL7c6DrqzD/W/KhgZ0EJ workspace-key
+-------------------------------------------------------------------------------
+
+📋 CARA PENGGUNAAN:
+
+1. Simpan private key di komputer Anda:
+   mkdir -p ~/.ssh
+   nano ~/.ssh/id_ed25519_workspace
+   [paste private key di atas]
+   chmod 600 ~/.ssh/id_ed25519_workspace
+
+2. Connect via SSH:
+   
+   Via Tailscale:
+   ssh -i ~/.ssh/id_ed25519_workspace -p 2222 z@100.75.52.31
+
+   Via Cloudflare Tunnel (setelah setup DNS):
+   ssh -i ~/.ssh/id_ed25519_workspace z@ssh.yourdomain.com
+
+===============================================================================
+                            CONNECTION INFO
+===============================================================================
+
+SSH Server:    Dropbear v2024.86
+Port:          2222
+Username:      z
+Tailscale IP:  100.75.52.31
+
+===============================================================================
